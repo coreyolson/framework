@@ -1,0 +1,12 @@
+{
+    "name": "coreyolson/framework",
+    "description": "A minimalist PHP framework",
+    "license": "MIT",
+    "support": {
+        "source": "https://github.com/coreyolson/framework",
+        "issues": "https://github.com/coreyolson/framework/issues"
+    },
+    "require": {
+        "php": ">=7.0.0"
+    }
+}
