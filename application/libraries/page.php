@@ -25,6 +25,7 @@
  * @method \libraries\page::js( $path );
  * @method \libraries\page::set( $mixed );
  * @method \libraries\page::get( $mixed );
+ * @method \libraries\page::isset( $mixed );
  * @method \libraries\page::unset( $mixed );
  * @method \libraries\page::setting( $mixed );
  */
@@ -59,7 +60,7 @@ class page
         ob_start();
 
         // Set defaults for a page
-        self::$data = array(
+        self::$data = [
 
             // Sets a default page title
             'title' => ($_SERVER['REQUEST_URI']=='/')
@@ -74,7 +75,10 @@ class page
 
             // Appended to page title
             'append' => false,
-        );
+
+            // Variables
+            'vars' => [],
+        ];
     }
 
     /**
@@ -360,7 +364,20 @@ class page
     public static function get($var)
     {
         // Retrieve value
-        self::$data['vars'][$var];
+        return self::$data['vars'][$var];
+    }
+
+    /**
+     * Detect if page variable isset.
+     *
+     * @param string
+     *
+     * @return mixed
+     */
+    public static function isset($var)
+    {
+        // Retrieve value
+        return isset(self::$data['vars'][$var]);
     }
 
     /**
