@@ -66,6 +66,7 @@
  * @method libraries\database::limit();
  * @method libraries\database::offset();
  * @method libraries\database::statement();
+ * @method libraries\database::queries();
  *
  *	Initialize class ...
  *
@@ -683,6 +684,9 @@ class database
             return $this;
         }
 
+        // Count number of queries
+        $this->data['queries'] = 1 + ($this->data['queries'] ?? 0);
+
         // Selection (Result) or Custom (Unknown) query types
         if ($this->data['type'] == 'SELECT' or $this->custom()) {
 
@@ -806,7 +810,7 @@ class database
         }
 
         // Set column separator
-        $c = $this->data['column'];
+        $c = ($args[0] == '*') ? '' : $this->data['column'];
 
         // Set the selection parameters
         $this->data['params'] = ' '.$c.implode($c.', '.$c, $args).$c;
@@ -1669,6 +1673,17 @@ class database
 
         // Return the statement
         return $query;
+    }
+
+    /**
+     * Query performance.
+     *
+     * @return string
+     */
+    public function queries()
+    {
+        // Return
+        return $this->data['queries'] ?? 0;
     }
 
     /**
