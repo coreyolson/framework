@@ -4,7 +4,7 @@
  * ------------------------------------------------
  * A minimalist PHP framework.
  *
- * @copyright   Copyright (c) 2010 - 2020 Corey Olson
+ * @copyright   Copyright (c) 2010 - 2021 Corey Olson
  * @license     https://opensource.org/licenses/MIT
  * @link        https://github.com/coreyolson/framework
  *
