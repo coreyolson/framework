@@ -170,6 +170,16 @@ class database
         // Allow custom connection (web sockets, etc.)
         if (isset($args['dsn'])) {
 
+            // Disable these features
+            if ( $args['driver'] == 'sqlite' ) {
+
+                // Set column
+                $this->data['column'] = '';
+
+                // Set dbname
+                $this->data['dbname'] = '';
+            }
+
             // Not instantiated yet...
             return $this->data['dsn'] = $args['dsn'];
         }
@@ -361,7 +371,7 @@ class database
         $this->data['connection'] = true;
 
         // Create and return the new database connection
-        return $this->data['dbh'] = new \PDO($this->data['dsn'], $this->data['user'], $this->data['password']);
+        return $this->data['dbh'] = new \PDO($this->data['dsn'], $this->data['user'] ?? null, $this->data['password'] ?? null);
     }
 
     /**
@@ -726,7 +736,13 @@ class database
         $this->reset();
 
         // Update the table to use
-        $this->data['table'] = $this->data['dbname'].'.'.$table;
+        $this->data['table'] = ($this->data['dbname']!='')
+
+            // Prefix database name
+            ? $this->data['dbname'].'.'.$table
+
+            // Or, not
+            : $table;
 
         // Allow chaining
         return $this;
