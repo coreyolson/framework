@@ -230,7 +230,9 @@ class agent
                 CURLOPT_VERBOSE        => true,
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_TIMEOUT_MS     => $this->data['timeout'],
+                CURLOPT_SSL_VERIFYHOST => ($this->data['secure']) ? 2 : false,
                 CURLOPT_SSL_VERIFYPEER => $this->data['secure'],
+                CURLOPT_FAILONERROR    => true,
                 CURLOPT_USERAGENT      => self::user_agent(),
         ]);
 
