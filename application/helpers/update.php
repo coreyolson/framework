@@ -12,7 +12,9 @@
  *
  * A helper for updating the framework version across sites or servers.
  *
- * @method helpers\update::_( );
+ * @method helpers\update::remap();
+ * @method helpers\update::version();
+ * @method helpers\update::raw();
  */
 namespace helpers;
 
@@ -27,41 +29,32 @@ class update
     ];
 
     // Internal information
-    private static $_version;
+    private static $_version = [];
 
     /**
      * Initialize update class.
      */
     public function __construct()
     {
-        // Developer specified version
-        self::$_version['version'] = f::info()['version'];
+        // Shown for example purposes
+        $ignore_files = ['readme.md'];
 
-        // Framework folder
-        $dir = f::info()['directory'].'application/';
+        // Framework uses these by default
+        $ignore_folders = ['storage', 'volume'];
 
-        // Check extension folders
-        foreach (['helpers', 'libraries'] as $ext) {
+        // Recursively discover files and hash
+        self::mapper( f::info()['directory'], $ignore_folders, $ignore_files);
+    }
 
-            // Extension folder
-            $subdir = $dir.$ext.'/';
-
-            // Iterate through extensions
-            foreach (helpers\file::contents($subdir) as $file) {
-
-                // Extension path
-                $path = $subdir.$file;
-
-                // Build file version info
-                self::$_version[$ext][$file] = md5_file($path).sha1_file($path);
-            }
-        }
-
-        // framework framework core
-        $main = $dir.'Framework.php';
-
-        // Build file information
-        self::$_version['framework'] = md5_file($main).sha1_file($main);
+    /**
+     * Remap directory
+     *
+     * @return array
+     */
+    public static function remap($dir, $ignore_folders, $ignore_files)
+    {
+        // Recursively map
+        self::mapper( $dir );
     }
 
     /**
@@ -73,47 +66,6 @@ class update
     {
         // framework.php
         return self::$_version;
-    }
-
-    /**
-     * Replace current framework files with latest version
-     *
-     * @var string
-     * @var string
-     *
-     * @return bool
-     */
-    public static function framework($mode = 'all', $file = null)
-    {
-        // Server framework
-        // TODO: Connect to Framework
-
-        // Update framework
-        if ( in_array($mode, ['all', 'framework']) ) {
-
-            // TODO: Update framework.php
-        }
-
-        // Update libraries
-        if ( in_array($mode, ['all', 'ext', 'libraries']) ) {
-
-            // TODO: Update all libraries
-        }
-
-        // Update helpers
-        if ( in_array($mode, ['all', 'ext', 'helpers']) ) {
-
-            // TODO: Update all helpers
-        }
-
-        // Update specific file
-        if ( in_array($mode, ['file']) ) {
-
-            // TODO: Update specific file
-        }
-
-        // Sucessful update
-        return true;
     }
 
     /**
@@ -144,5 +96,50 @@ class update
 
         // Failure
         return false;
+    }
+
+    /**
+     * Recursively discovers files
+     *
+     * @return mixed
+     */
+    private static function mapper($dir = null, $ignore_folders = [], $ignore_files = [])
+    {
+        // Iterate through extensions
+        foreach (helpers\file::contents($dir) as $file) {
+
+            // Extension path
+            $path = $dir.$file;
+
+            // Create a "relative" file path
+            $relative = str_replace(f::info()['directory'], '', $path);
+
+            // Ignore these files
+            if (in_array($file, $ignore_files)) {
+
+                // Ignored
+                continue;
+            }
+
+            // Check directory
+            if ( is_dir($path) ) {
+
+                // Ignore these files
+                if (in_array($relative, $ignore_folders)) {
+
+                    // Ignored
+                    continue;
+                }
+
+                // Recursively
+                self::mapper($path.'/', $ignore_folders, $ignore_files);
+
+            // File
+            } else {
+
+                // Create file hashes for file path to denote changes
+                self::$_version[$relative] = md5_file($path).sha1_file($path);
+            }
+        }
     }
 }
