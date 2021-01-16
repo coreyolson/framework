@@ -12,9 +12,10 @@
  *
  * A helper for updating the framework version across sites or servers.
  *
+ * @method helpers\update::raw();
  * @method helpers\update::remap();
  * @method helpers\update::version();
- * @method helpers\update::raw();
+ * @method helpers\update::verify();
  */
 namespace helpers;
 
@@ -47,28 +48,6 @@ class update
     }
 
     /**
-     * Remap directory
-     *
-     * @return array
-     */
-    public static function remap($dir, $ignore_folders, $ignore_files)
-    {
-        // Recursively map
-        self::mapper( $dir );
-    }
-
-    /**
-     * Framework version
-     *
-     * @return array
-     */
-    public static function version()
-    {
-        // framework.php
-        return self::$_version;
-    }
-
-    /**
      * Returns raw file contents
      *
      * @var string
@@ -96,6 +75,42 @@ class update
 
         // Failure
         return false;
+    }
+
+    /**
+     * Remap directory
+     *
+     * @return void
+     */
+    public static function remap($dir, $ignore_folders, $ignore_files)
+    {
+        // Recursively map
+        self::mapper( $dir );
+    }
+
+    /**
+     * Framework version
+     *
+     * @return array
+     */
+    public static function version()
+    {
+        // framework.php
+        return self::$_version;
+    }
+
+    /**
+     * Verify hash
+     *
+     * @var string
+     * @var string
+     *
+     * @return boolean
+     */
+    public static function verify($content, $hash)
+    {
+        // Check contents against provided hash
+        return $hash == md5($content).sha1($content);
     }
 
     /**
