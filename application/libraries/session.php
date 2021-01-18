@@ -61,15 +61,25 @@ class session
     private static $session_renew = 300;
 
     /**
+     * Cookie name for session identifier
+     *
+     * @var int
+     */
+    private static $name = 'id_app';
+
+    /**
      * Setup the session environment, check session exists, runs security.
      */
     public function __construct()
     {
         // Cookie name
-        session_name('app_id');
+        session_name(self::$name);
+
+        // Cookie age
+        session_set_cookie_params(self::$session_length);
 
         // Check for a valid session cookie
-        if (!isset($_COOKIE['app_id']) OR !isset($_COOKIE['app_id'][63])) {
+        if (!isset($_COOKIE[self::$name]) OR !isset($_COOKIE[self::$name][63])) {
 
             // Generate a new session id
             session_id(self::session_id(true));
@@ -77,7 +87,7 @@ class session
         } else {
 
             // Use the user provided session
-            self::$session = $_COOKIE['app_id'];
+            session_id($_COOKIE[self::$name]);
         }
 
         // Starts the session
@@ -113,6 +123,8 @@ class session
         do {
             // Add some randomness
             $id .= mt_rand(0, mt_getrandmax());
+
+        // Keep going
         } while (strlen($id) < 64);
 
         // Additional entropy
@@ -294,7 +306,7 @@ class session
     public static function id($truncate = false)
     {
         // Check that $_COOKIE exists
-        if (!isset($_COOKIE['app_id'])) {
+        if (!isset($_COOKIE[self::$name])) {
 
             // Create a new session
             return self::session_id(true);
@@ -304,11 +316,11 @@ class session
         if ($truncate !== false) {
 
             // Get a truncated version of the session ID
-            return substr($_COOKIE['app_id'], 0, $truncate);
+            return substr($_COOKIE[self::$name], 0, $truncate);
         }
 
         // Return session identifier
-        return $_COOKIE['app_id'];
+        return $_COOKIE[self::$name];
     }
 
     /**
