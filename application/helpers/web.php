@@ -39,6 +39,7 @@
  * @method helpers\web::is_self();
  * @method helpers\web::only_self();
  * @method helpers\web::is_www();
+ * @method helpers\web::only_secure();
  */
 namespace helpers;
 
@@ -275,7 +276,7 @@ class web
     public static function secure()
     {
         // Convert protocol status to boolean
-        return  self::protocol() == 'https';
+        return self::protocol() == 'https';
     }
 
     /**
@@ -286,7 +287,7 @@ class web
     public static function insecure()
     {
         // Convert protocol status to boolean
-        return  self::protocol() == 'http';
+        return self::protocol() == 'http';
     }
 
     /**
@@ -556,5 +557,22 @@ class web
 
         // Count number of TLD pieces; Check www on first piece
         return (sizeof($host === 3) AND array_shift($host) == 'www');
+    }
+
+    /**
+     * Stop execution if not HTTPS
+     *
+     * @param string
+     *
+     * @return bool
+     */
+    public static function only_secure($show404 = false)
+    {
+        // Prevent external requests
+        if ( self::insecure() ) {
+
+            // Show 404 or return
+            return ($show404) ? self::error_404() : exit();
+        }
     }
 }
